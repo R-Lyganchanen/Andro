@@ -41,10 +41,13 @@
   <script src="db.js"></script>
   <script src="app.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(console.error);
-    }
-  </script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW зарегистрирован'))
+      .catch(err => console.error('SW error', err));
+  }
+</script>
 
 </body>
+
 </html>
