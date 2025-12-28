@@ -4,7 +4,6 @@ const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
-  `${BASE}`,
   `${BASE}index.html`,
   `${BASE}page2.html`,
   `${BASE}page3.html`,
@@ -13,8 +12,6 @@ const PRECACHE_URLS = [
   `${BASE}app.js`,
   `${BASE}db.js`,
   `${BASE}manifest.json`,
-  `${BASE}icons/icon-192.png`,
-  `${BASE}icons/icon-512.png`,
   `${BASE}icons/icon-180.png`
 ];
 
@@ -85,3 +82,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
