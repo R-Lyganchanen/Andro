@@ -112,12 +112,7 @@ overlay.addEventListener('click', () => {
     startY = t.clientY;
   });
 
-  inform.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
-    const diffX = t.clientX - startX;
-    const diffY = t.clientY - startY;
-
-    // Свайп вправо, при этом горизонталь доминирует над вертикалью
+      // Свайп вправо, при этом горизонталь доминирует над вертикалью
     if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
       closeInformPage();
     }
@@ -148,5 +143,6 @@ overlay.addEventListener('click', () => {
 })();
 
 })();
+
 
 
