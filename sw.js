@@ -43,7 +43,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((resp) => {
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
+          caches.open(RUNTIME_CACHE).then((cache) => const respClone = resp.clone();
+cache.put(request, respClone);
           return resp;
         })
         .catch(() =>
@@ -82,4 +83,5 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
