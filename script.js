@@ -118,31 +118,7 @@ overlay.addEventListener('click', () => {
     }
   });
 
-// Проверка на ноль для цифровой формы
-   (function() {
-  const inform = document.getElementById('informPage');
-  if (!inform) return; // если элемента нет, выходим
 
-  let startX = 0, startY = 0;
-
-  inform.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    startX = t.clientX;
-    startY = t.clientY;
-  });
-
-  inform.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
-    const diffX = t.clientX - startX;
-    const diffY = t.clientY - startY;
-
-    if (diffX > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-      closeInformPage();
-    }
-  });
-})();
-
-})();
 
 
 
