@@ -1,27 +1,29 @@
-const CACHE_VERSION = 'v1.0.2';
+const BASE = '/Andro/';
+const CACHE_VERSION = 'v1.0.3';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
-  '/', '/index.html',
-  '/page2.html', '/page3.html',   // ← добавлены страницы
-  '/style.css', '/app.js', '/db.js',
-  '/manifest.json',
-  '/offline.html',
-  '/logo_light.png',
-  '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-180.png'
+  `${BASE}`,
+  `${BASE}index.html`,
+  `${BASE}page2.html`,
+  `${BASE}page3.html`,
+  `${BASE}offline.html`,
+  `${BASE}style.css`,
+  `${BASE}app.js`,
+  `${BASE}db.js`,
+  `${BASE}manifest.json`,
+  `${BASE}icons/icon-192.png`,
+  `${BASE}icons/icon-512.png`,
+  `${BASE}icons/icon-180.png`
 ];
 
 self.addEventListener('install', (event) => {
-  console.log('[SW] install');
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS))
-  );
+  event.waitUntil(caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] activate');
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.map((key) => {
@@ -36,18 +38,20 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (url.origin !== self.location.origin) return;
+  // Работать только в пределах нашего проекта
+  if (!url.pathname.startsWith(BASE)) return;
 
-  // HTML навигация: NetworkFirst + офлайн-фоллбек
-  if (request.mode === 'navigate' ||
-      request.headers.get('accept')?.includes('text/html')) {
+  // HTML: NetworkFirst с офлайн-фоллбеком
+  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
         .then((resp) => {
           caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
           return resp;
         })
-        .catch(() => caches.match(request).then((resp) => resp || caches.match('/offline.html')))
+        .catch(() =>
+          caches.match(request).then((resp) => resp || caches.match(`${BASE}offline.html`))
+        )
     );
     return;
   }
@@ -56,10 +60,12 @@ self.addEventListener('fetch', (event) => {
   if (request.destination === 'image') {
     event.respondWith(
       caches.match(request).then((cached) => {
-        const network = fetch(request).then((resp) => {
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
-          return resp;
-        }).catch(() => cached);
+        const network = fetch(request)
+          .then((resp) => {
+            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
+            return resp;
+          })
+          .catch(() => cached);
         return cached || network;
       })
     );
@@ -69,11 +75,13 @@ self.addEventListener('fetch', (event) => {
   // Остальное: Stale-While-Revalidate
   event.respondWith(
     caches.match(request).then((cached) => {
-      const network = fetch(request).then((resp) => {
-        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
-        return resp;
-      }).catch(() => cached);
+      const network = fetch(request)
+        .then((resp) => {
+          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
+          return resp;
+        })
+        .catch(() => cached);
       return cached || network;
     })
   );
-});   
+});
