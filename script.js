@@ -122,5 +122,27 @@ overlay.addEventListener('click', () => {
       closeInformPage();
     }
   });
+/* =========================================================
+   Обработка клавиатуры (keypad)
+   ========================================================= */
+(function () {
+  const keypad = document.querySelector('.keypad');
+  if (!keypad) return; // если элемента нет на странице, просто выходим
+
+  keypad.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'BUTTON') return;
+    const val = e.target.textContent.trim();
+
+    // твоя логика обработки кнопок
+    if (val === '⌫') {
+      // удалить символ
+    } else {
+      // добавить символ
+    }
+  });
 })();
+
+   
+
+
 
