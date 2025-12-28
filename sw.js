@@ -38,23 +38,24 @@ self.addEventListener('fetch', (event) => {
   // Работать только в пределах нашего проекта
   if (!url.pathname.startsWith(BASE)) return;
 
-  // HTML: NetworkFirst с офлайн-фоллбеком
-  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
-    event.respondWith(
-      fetch(request).then((resp) => {
-  const respClone = resp.clone(); // объявляем переменную внутри блока
-  caches.open(RUNTIME_CACHE).then((cache) => {
-    cache.put(request, respClone);
-  });
-  return resp; // оригинал отдаём браузеру
-});
-        })
-        .catch(() =>
-          caches.match(request).then((resp) => resp || caches.match(`${BASE}offline.html`))
-        )
-    );
-    return;
-  }
+ // HTML: NetworkFirst с офлайн-фоллбеком
+if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+  event.respondWith(
+    fetch(request)
+      .then((resp) => {
+        const respClone = resp.clone(); // клонируем сразу
+        caches.open(RUNTIME_CACHE).then((cache) => {
+          cache.put(request, respClone);
+        });
+        return resp; // оригинал отдаём браузеру
+      })
+      .catch(() =>
+        caches.match(request).then((resp) => resp || caches.match(`${BASE}offline.html`))
+      )
+  );
+  return;
+}
+
 
 // Изображения: CacheFirst
 if (request.destination === 'image') {
@@ -86,6 +87,7 @@ if (request.destination === 'image') {
     })
   );
 });
+
 
 
 
