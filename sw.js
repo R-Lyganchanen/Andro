@@ -54,21 +54,22 @@ cache.put(request, respClone);
     return;
   }
 
-  // Изображения: CacheFirst
-  if (request.destination === 'image') {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        const network = fetch(request)
-          .then((resp) => {
-            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resp.clone()));
-            return resp;
-          })
-          .catch(() => cached);
-        return cached || network;
-      })
-    );
-    return;
-  }
+// Изображения: CacheFirst
+if (request.destination === 'image') {
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const network = fetch(request)
+        .then((resp) => {
+          const respClone = resp.clone(); // клонируем сразу
+          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, respClone));
+          return resp; // оригинал отдаём браузеру
+        })
+        .catch(() => cached);
+      return cached || network;
+    })
+  );
+  return;
+}
 
   // Остальное: Stale-While-Revalidate
   event.respondWith(
@@ -83,5 +84,6 @@ cache.put(request, respClone);
     })
   );
 });
+
 
 
