@@ -41,11 +41,13 @@ self.addEventListener('fetch', (event) => {
   // HTML: NetworkFirst с офлайн-фоллбеком
   if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
-      fetch(request)
-        .then((resp) => {
-          caches.open(RUNTIME_CACHE).then((cache) => const respClone = resp.clone();
-cache.put(request, respClone);
-          return resp;
+      fetch(request).then((resp) => {
+  const respClone = resp.clone(); // объявляем переменную внутри блока
+  caches.open(RUNTIME_CACHE).then((cache) => {
+    cache.put(request, respClone);
+  });
+  return resp; // оригинал отдаём браузеру
+});
         })
         .catch(() =>
           caches.match(request).then((resp) => resp || caches.match(`${BASE}offline.html`))
@@ -84,6 +86,7 @@ if (request.destination === 'image') {
     })
   );
 });
+
 
 
 
