@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>App — Код</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="App">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app form-screen page2">
+  <div class="app passcode">
+    <div class="passcode__header">Код для входу</div>
+
+    <!-- Индикатор (4 точки) -->
+    <div class="dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
+    <!-- Цифровая клавиатура -->
+    <div class="keypad">
+      <button data-key="1">1</button>
+      <button data-key="2">2</button>
+      <button data-key="3">3</button>
+      <button data-key="4">4</button>
+      <button data-key="5">5</button>
+      <button data-key="6">6</button>
+      <button data-key="7">7</button>
+      <button data-key="8">8</button>
+      <button data-key="9">9</button>
+    <button class="empty" disabled></button>
+      <button data-key="0">0</button>
+      <button class="backspace" data-key="back">×</button>
+    </div>
+
+    <div class="passcode__footer">Не пам’ятаю код для входу</div>
+  </div>
+</div>
+  <script src="script.js" defer></script>
+  <script>
+    // Логика ввода кода 1234, сброс при ошибке, переход на page3.html
+    (function () {
+      const correct = '1234';
+      let input = '';
+
+      const dots = Array.from(document.querySelectorAll('.dots .dot'));
+      const keypad = document.querySelector('.keypad');
+
+      function renderDots(len) {
+        dots.forEach((d, i) => {
+          d.classList.toggle('filled', i < len);
+        });
+      }
+
+      function reset() {
+        input = '';
+        renderDots(0);
+      }
+
+      keypad.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const key = btn.dataset.key;
+
+        if (key === 'back') {
+          input = input.slice(0, -1);
+          renderDots(input.length);
+          return;
+        }
+
+        if (/^\d$/.test(key)) {
+          if (input.length < 4) {
+            input += key;
+            renderDots(input.length);
+          }
+          if (input.length === 4) {
+            if (input === correct) {
+              location.href = 'page3.html';
+            } else {
+              reset(); // молча сбрасываем
+            }
+          }
+        }
+      });
+    })();
+  </script>
+  <script src="db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

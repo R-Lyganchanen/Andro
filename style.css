@@ -1,0 +1,589 @@
+/* =========================================================
+   Общие настройки: блокировка скролла и safe-area
+   ========================================================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+
+body {
+  background: #f2f2f2;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* Корневой контейнер приложения */
+.app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+}
+
+/* Фоны страниц */
+.app.form-screen.page1 { background-color: #23221e; }
+.app.form-screen.page2 { background-color: #e1dfcc; }
+.app.form-screen.page3 { background-color: #e1dfcc; }
+
+/* =========================================================
+   Заставка
+   ========================================================= */
+.splash { display: grid; place-items: center; }
+.splash__logo { width: 10vw; height: 11vw; border-radius: 0%; background: #23221e; margin-bottom: -69vw; }
+.splash__title { gap: 1vh; text-align: center; margin-top: -45vh; font-weight: 700; font-size: 6vw; line-height: 1.1; color: #cccab9; }
+.splash__title span { display: block; }
+
+/* =========================================================
+   Ввод кода
+   ========================================================= */
+.passcode {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  align-items: center;
+  justify-items: center;
+}
+.passcode__header {
+  justify-self: start;
+  font-size: 8vw;
+  font-weight: 500;
+  margin-bottom: 14vh;
+  position: relative;
+  top: 4.5vh;
+  padding-left: 6vw;
+  text-align: left;
+}
+.dots { display: flex; gap: 2.5vw; margin: 2vh 0 4vh; }
+.dot { width: 3vw; height: 3vw; border-radius: 50%; background: #ffffff; position: relative; top: 2.5vh; }
+.dot.filled { background: #000; }
+
+/* Клавиатура 3x4 */
+.keypad {
+  position: relative;
+  top: 4vh;
+  width: 75vw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4vw;
+}
+.keypad button,
+.keypad .empty {
+  width: 22vw;
+  height: 22vw;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  font-size: 8vw;
+  font-weight: 900;
+  color: #000;
+}
+.keypad .empty { visibility: hidden; }
+.keypad .backspace { font-size: 8vw; font-weight: 700; background: #fff; }
+
+.passcode__footer {
+  position: relative;
+  top: -3vh;
+  font-size: 4.5vw;
+  font-weight: 500;
+  color: #555;
+}
+
+/* =========================================================-----------------------------------------------------------
+   Форма на третьей странице — СЦЕНА И КАРТОЧКА
+   ========================================================= */
+.form-screen { position: relative; }
+
+
+/* Кнопка в верхнем правом углу */
+.top-action-btn {
+  position: absolute;
+  top: 5%;                /* отступ сверху */
+  right: 5%;             /* отступ справа */
+  width: 33vw;            /* ширина = 33% экрана */
+  height: 4vh;            /* высота = 5% экрана */
+  background-color: #ffffff; /* белый фон */
+  border: none;
+  border-radius: 2.5vh;   /* радиус = половина высоты → закруглённые короткие стороны */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;               /* расстояние между иконкой и текстом */
+  cursor: pointer;
+  z-index: 50;            /* выше плашки */
+}
+/* Иконка */
+.top-action-btn .btn-icon {
+  height: 60%;            /* иконка занимает часть высоты кнопки */
+  width: auto;
+}
+/* Текст */
+.top-action-btn .btn-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+
+/* Сцена (перспектива) — отступы сохранены */
+.form-wrapper {
+  position: absolute;
+  left: 6vw;
+  right: 6vw;
+  top: 15vh;
+  bottom: 22vh;
+  perspective: 700px; /* глубина 3D переворота */
+}
+
+/* Вращаемая карточка:
+   - чистая: НЕТ рамки, НЕТ радиуса, НЕТ overflow;
+   - только 3D-трансформация и анимация.
+   Это критично для стабильности в iOS/Safari. */
+/* Переворот — как у тебя */
+.form-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+/* Состояние переворота (направление влево, как использовал) */
+.form-card.flipped { transform: rotateY(-180deg); }
+
+/* Обе стороны:
+   - занимают всю карточку;
+   - скрывают обратную сторону (backface-visibility);
+   - фон/рамка лежат на самой стороне через PNG. */
+/* Стороны: только цвет фона, радиус, обрезка */
+.form-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  /* важные отличия от неработающих вариантов */
+  border-radius: 12px;   /* скругление формы */
+  overflow: hidden;      /* аккуратно обрезаем контент по радиусу */
+}
+
+
+/* Лицевая сторона — повернута к зрителю */
+/* Разные цвета для сторон */
+.form-front {
+  transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  background-color: #d5d3be; /* твой фронт-фон */
+}
+
+/* Фон-рамка PNG (front-frame.png, back-frame.png):
+   - заполняет весь бокс стороны;
+   - прозрачный PNG с нарисованной рамкой и скруглением. */
+.frame-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none; /* не мешает кликам по контенту */
+  z-index: 1;          /* под контентом, над "чистым" фоном */
+}
+.form-front, .form-back {
+  border: 3px solid #959485;
+  border-radius: 12px;
+}
+
+.form-back {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  background-color: #ffffff; /* твой задний фон */
+}
+
+/* =========================================================
+   Контент фронта: фото, плашка, тикер, кнопка
+   ========================================================= */
+
+.form-photo {
+  position: absolute;   /* фото позиционируется внутри .form-front */
+  top: 8vh;            /* отступ сверху */
+  left: 5vw;            /* отступ слева */
+  width: 35vw;          /* ширина фото */
+  height: 22vh;         /* высота фото */
+  object-fit: cover;    /* картинка заполняет блок */
+  border-radius: 12px;   /* скругление углов */
+  z-index: 2;           /* над фоном, под рамкой */
+}
+/*Логотип темный на плашке*/
+.form-logo {
+  position: absolute;
+  top: 1vh;       /* отступ сверху */
+  right: 3vw;     /* отступ справа */
+  width: 10vw;    /* ширина логотипа */
+  height: auto;   /* пропорции сохраняются */
+  z-index: 3;     /* выше фона, но ниже рамки если нужно */
+}
+
+/* Все текстовые поля на плашке лицевая часть */
+.form-text-block-1 {
+  position: absolute;
+  left: 5.5%;
+  bottom: 20%;
+  width: 40%;
+  font-size: 1.6rem; 
+  font-size: 1rem; 
+  color: #55544c; 
+  z-index: 2;
+}
+.form-text-block-2 {
+  position: absolute;
+  left: 5.5%;
+  bottom: 1.5%;
+  width: 40%;
+  font-size: 1.6rem; 
+  font-weight: 500;
+  color: #000000; 
+  line-height: 0.3rem;
+  z-index: 2;
+}
+.form-text-block-logo {
+  position: absolute;
+  left: 5.5%;
+  top: 1.5%;
+  width: 30%;
+  font-size: 1.6rem; 
+  font-weight: 500;
+  color: #000000; 
+  line-height: 0.3rem;
+  z-index: 2;
+}
+.form-text-block-data {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  width: 40%;
+  
+  z-index: 2;
+}
+.form-text-block-otsrok {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  width: 40%;
+  z-index: 2;
+}
+.line3 {
+  font-size: 1rem; 
+  color: #55544c; 
+ 
+  
+}
+.line1 {
+   font-size: 1.4rem; 
+  font-weight: 500;
+  color: #000000; 
+  line-height: 0.3rem; 
+  margin: -2px 0;
+}
+
+
+/* Цикличная полоса (позиции сохранены) */
+.form-ticker {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 20vh;
+  height: 2.9vh;
+  background: #654d1d;
+  color: #fdf8f4;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+.ticker__track {
+  display: flex;
+  width: max-content;              /* ширина = сумма всех элементов */
+  animation: formScroll 30s linear infinite;
+}
+.ticker__item {
+  flex: 0 0 auto;
+  padding: 0 0.5vw;                  /* расстояние между повторениями */
+  font-weight: 600;
+  font-size: 3.5vw;
+  white-space: nowrap;
+  display: flex;          /* выравниваем содержимое по центру */
+}
+@keyframes formScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* уезжает на половину дорожки */
+}
+
+
+/* Кнопка "+" (позиции сохранены) */
+.form-circle-btn {
+  position: relative;
+  right: -33vw;
+  bottom: -23vh;
+  width: min(12vw, 12vh);
+  height: min(12vw, 12vh);
+  border-radius: 50%;
+  border: none;
+  background: #fd890a;
+  color: #fd890a; /* текст не используется */
+  font-size: 0;   /* исчезает влияние текста */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: opacity 0.2s ease;
+  opacity: 1;
+}
+
+/* Плюс на кнопке псевдоэлементами */
+.form-circle-btn::before,
+.form-circle-btn::after {
+  content: "";
+  position: absolute;
+  background: #000000;
+}
+.form-circle-btn::before { width: 40%; height: 8%; }  /* горизонтальная */
+.form-circle-btn::after  { height: 40%; width: 8%; }  /* вертикальная */
+
+/* Скрыть кнопку при перевороте (без JS) */
+.form-card.flipped .form-front .form-circle-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* При перевороте мягко скрываем фронт-контент (фото, плашка, тикер, кнопка) */
+.form-card.flipped .form-front .form-photo,
+.form-card.flipped .form-front .form-text-block,
+.form-card.flipped .form-front .form-ticker,
+.form-card.flipped .form-front .form-circle-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* =========================================================
+   Контент задней стороны
+   ========================================================= */
+/* Задник-иллюстрация остаётся как было */
+.back-image {
+  position: absolute;
+  bottom: 23%;                 /* отступ сверху */
+  left: 50%;                 /* ставим точку в середину */
+  transform: translateX(-50%); /* сдвигаем назад на половину ширины */
+  width: 280px;            /* ширина фото */
+  height: 280px;              /* высота фото */
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+}
+/* Текстовый блок на задней стороне */
+.back-text-block {
+  position: absolute;
+  top: 10%;              /* отступ сверху */
+  left: 50%;             /* центрируем по ширине */
+  transform: translateX(-50%);
+  width: 80%;            /* ширина блока */
+  padding: 12px;
+  z-index: 3;            /* выше картинки */
+  text-align: center;
+}
+
+/* Стили строк */
+.back-line1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 6px;
+}
+.back-line2 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #555;
+  margin: 0;
+}
+
+
+
+
+/* =========================================================
+   Нижняя панель
+   ========================================================= */
+:root {
+  --toolbar-bottom: 0;
+  --toolbar-height: 11vh;
+  --toolbar-bg: #fff;
+  --toolbar-padding-h: 6vw;
+  --toolbar-gap: 6vw;
+
+  --tool-image-width: 10vw;
+  --tool-image-height: 10vw;
+  --tool-label-font-size: 3.1vw;
+  --tool-label-color: #0d0d0d;
+  --tool-label-weight: 900;
+  --tool-gap: 0.1vh;
+}
+.bottom-toolbar {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: var(--toolbar-bottom);
+  height: var(--toolbar-height);
+  background: var(--toolbar-bg);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding: 0 var(--toolbar-padding-h);
+  gap: var(--toolbar-gap);
+  z-index: 10;
+}
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tool-gap);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.tool-img { width: var(--tool-image-width); height: var(--tool-image-height); object-fit: contain; }
+.tool-label { font-size: var(--tool-label-font-size); color: var(--tool-label-color); font-weight: var(--tool-label-weight); line-height: 1.1; }
+
+/* =========================================================
+   Меню снизу
+   ========================================================= */
+.menu {
+  position: fixed;
+  left: 5%;
+  right: 5%;
+  height: 53%;
+  background: #fff;
+  border-radius: 18px 18px 18px 18px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+  padding: 20px;
+
+  bottom: 4.5%;
+  transform: translateY(110%);  /* скрыто */
+  z-index: 1000;                /* выше всего */
+}
+.menu.open { transform: translateY(0); }
+.menu ul { list-style: none; margin: 0; padding: 0; }
+.menu li { padding: 12px; font-size: 1.2rem;  }
+
+.overlay {
+  position: fixed;
+  inset: 0;                        /* растягиваем на весь экран */
+  background: rgba(51, 49, 49, 0.4);     /* полупрозрачное затемнение */
+  opacity: 0;                      /* по умолчанию невидим */
+  pointer-events: none;            /* не мешает кликам */
+  transition: opacity 0.3s ease;
+  z-index: 999;                    /* ниже меню, выше контента */
+}
+
+.overlay.open {
+  opacity: 1;                      /* при открытии становится видимым */
+  pointer-events: auto;            /* ловит клики (например, для закрытия меню) */
+}
+
+
+/*________________________________Страница INFORM___________________________________________*/
+.page-inform {
+  position: fixed;
+  inset: 0;
+  background: #e1dfcc;
+  transform: translateX(100%);
+  transition: transform 0.5s ease;
+  z-index: 2000;
+}
+.page-inform.open {
+  transform: translateX(0);
+}
+
+
+/* Иконка назад */
+.back-icon {
+  position: absolute;
+  top: 2vh;
+  left: 2vw;
+  width: 32px;
+  height: auto;
+  cursor: pointer;
+}
+
+/* Прямоугольная форма */
+.info-box1 {
+  margin: 0 6%;        /* отступы слева/справа */
+  margin-top: 15%;     /* отступ сверху от страницы */
+  height: 19%;         /* высота формы */
+  background: #fff;
+  border-radius: 16px;
+  padding: 0;          /* убираем общий padding, всё регулируем индивидуально */
+  display: flex;
+  flex-direction: column;
+}
+.info-box2 {
+  margin: 0 6%;        /* отступы слева/справа */
+  margin-top: 5%;     /* отступ сверху от страницы */
+  height: 22%;         /* высота формы */
+  background: #fff;
+  border-radius: 16px;
+  padding: 0;          /* убираем общий padding, всё регулируем индивидуально */
+  display: flex;
+  flex-direction: column;
+}
+/* Общие стили текста */
+.text-line {
+  font-size: 1rem;
+  margin: 0 4%;
+  
+}
+
+/* Индивидуальные отступы */
+.line01 {
+  margin-top: 15px;    /* расстояние от верхнего края формы до первой строки */
+  margin-bottom: 8px;  /* расстояние до второй строки */
+  color: #000000;
+  font-size: 1.2rem; 
+  font-weight: 500;
+}
+
+.line02 {
+  margin-bottom: 10px; /* расстояние до линии */
+  color: #000000;
+  font-size: 1.2rem; 
+  font-weight: 500;
+}
+
+.divider {
+  margin: 0 4%;        /* линия отступает от краёв формы на 6% */
+  margin-bottom: 10px; /* расстояние до третьей строки */
+  border: none;
+  border-top: 1px solid #e1dfcc;
+}
+
+.line03 {
+  margin-bottom: 10px; /* нижний зазор внутри формы */
+  color: #959485;
+  
+  font-weight: 500;
+  
+}

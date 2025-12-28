@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>App — Заставка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="App">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+   <meta name="theme-color" content="#0a0a0a" />
+   <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Код для входу" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app form-screen page1">
+
+  <div class="app splash">
+    <img src="icons/logo_light.png" alt="Рисунок" class="splash__logo">
+      <div class="splash__title">
+      <span>Проппоппоп</span>
+      <span>укеукеуе  </span>
+      <span>КУкукеук</span>
+    
+    </div>
+      </div>
+</div>
+  <script src="script.js" defer></script>
+  <script>
+    // Переход на страницу ввода кода через 1.5 секунды
+    setTimeout(() => {
+      location.href = 'page2.html';
+    }, 1500);
+  </script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
+  </script>
+
+</body>
+</html>

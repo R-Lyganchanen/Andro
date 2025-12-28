@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>App — Форма</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- PWA meta -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="App">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Основные стили приложения -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Корневой экран формы (page3) -->
+  <div class="app form-screen page3">
+    <!-- Внутренний контейнер экрана -->
+    <div class="app form-screen">
+      <!-- Сцена формы с перспективой для 3D-переворота -->
+      <div class="form-wrapper">
+        <!-- Вращаемая карточка: чистая, только 3D-трансформация (без рамки/радиуса/overflow) -->
+        <div class="form-card" id="card">
+          <!-- Лицевая сторона: фон — PNG с нарисованной рамкой -->
+          <div class="form-face form-front">
+            <!-- Фон-рамка фронта (PNG с прозрачностью) -->
+            <img src="icons/front-frame.png" alt="Фон рамка фронта" class="frame-bg">
+            <!--     3Логотип на рамке темный -->
+            <img src="icons/logo_black.png" alt="Логотип" class="form-logo">
+            <!-- Контент фронта: фото -->
+            <img src="icons/photo.png" alt="Фото" class="form-photo">
+
+            <!-- Плашка с четырьмя строками -->
+            <div class="form-text-block-1">
+              <p>Hiropportrtn</p>
+            </div>
+            <div class="form-text-block-2">
+              <p>FIRONOR</p>
+              <p>JOROF</p>
+              <p>VIRODOR</p>
+            </div>
+            <!-- Название лого -->
+            <div class="form-text-block-logo">
+              <p>Figoro ID</p>
+            </div>
+             <!-- Дата -->
+            <div class="form-text-block-data">
+              <p class="line3">Дата народження:</p>
+              <p class="line1">07.06.1997</p>
+            </div>
+            <div class="form-text-block-otsrok">
+              <p class="line3">Відсрочка до:</p>
+              <p class="line1">24.12.2075</p>
+            </div>
+            <!-- Цикличная полоса -->
+            <div class="form-ticker">
+              <div class="ticker__track">
+                <div class="ticker__item">&bull; Документ оновлено о 17:38 | 23.12.2025</div>
+                <div class="ticker__item">&bull; Документ оновлено о 17:38 | 23.12.2025</div>
+                <div class="ticker__item">&bull; Документ оновлено о 17:38 | 23.12.2025</div>
+                <div class="ticker__item">&bull; Документ оновлено о 17:38 | 23.12.2025</div>
+              </div>
+            </div>
+                   
+            <!-- Круглая кнопка "+" (открывает нижнее меню) -->
+            <button class="form-circle-btn" aria-label="Меню"></button>
+          </div>
+
+          <!-- Обратная сторона: фон — PNG с рамкой + иллюстрация -->
+          <div class="form-face form-back">
+            <!-- Фон-рамка задника (PNG с прозрачностью) -->
+            <img src="icons/back-frame.png" alt="Фон рамка задника" class="frame-bg">
+
+            <!-- Иллюстрация на задней стороне (заполняет всю область) -->
+            <img src="icons/QR.png" alt="Рисунок" class="back-image">
+            <!-- Текстовое поле поверх изображения -->
+            <div class="back-text-block">
+              <p class="back-line2">QR-код дійсний до 23 грудня 2026</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Нижнее выезжающее меню -->
+  <div class="overlay" id="overlay"></div>
+  <div class="menu" id="menu">
+    <ul>
+      <li>Пункт 1</li>
+      <li>Пункт 2</li>
+      <li>Пункт 3</li>
+      <li>Пункт 4</li>
+      <li>Пункт 5</li>
+      <li>Пункт 6</li>
+      <li>Пункт 7</li>
+    </ul>
+  </div>
+
+  <!-- Нижняя панель с тремя кнопками -->
+  <div class="bottom-toolbar">
+    <button class="tool-btn" aria-label="Кнопка 1">
+      <img src="icons/btn1.png" alt="Іконка 1" class="tool-img">
+      <span class="tool-label">IDВШ</span>
+    </button>
+    <button class="tool-btn" aria-label="Кнопка 2">
+      <img src="icons/btn2.png" alt="Іконка 2" class="tool-img">
+      <span class="tool-label">Bvtyf</span>
+    </button>
+    <button class="tool-btn" aria-label="Кнопка 3">
+      <img src="icons/btn3.png" alt="Іконка 3" class="tool-img">
+      <span class="tool-label">Nj;t</span>
+    </button>
+  </div>
+
+
+  <!------------------------------------------------------- Страница Inform -------------------------------------------------------->
+
+    <button class="top-action-btn" onclick="openInformPage()">
+      <span class="btn-label">Сповіщення</span>
+      <img src="icons/bels.png" alt="Иконка" class="btn-icon">
+    </button>
+  </div>
+
+  <!-- Слой страницы inform (скрыт, выезжает справа) -->
+  <div class="app form-screen page-inform" id="informPage">
+    <!-- Стрелка назад как картинка -->
+    <img src="icons/back-arrow.png" alt="Назад" class="back-icon" onclick="closeInformPage()">
+    <!-- Прямоугольная форма -->
+     <div id="formsContainer">
+        <!-- Здесь будут появляться новые формы -->
+    </div>
+
+    <div class="info-box1">
+      <p class="text-line line01">Дані з реєстру Оберіг отримано</p>
+      <p class="text-line line02">Військово-обліковий документ вже достпний</p>
+      <hr class="divider">
+      <p class="text-line line03">23.12.2025 о 17:38</p>
+    </div>
+    <div class="info-box2">
+      <p class="text-line line01">Запит на інформацію з реєстру відправлено</p>
+      <p class="text-line line02">Очікуйте сповіщення про результат обробки запису</p>
+      <hr class="divider">
+      <p class="text-line line03">23.12.2025 о 17:37</p>
+    </div>
+    
+
+
+
+    
+  </div>
+
+
+  <!-- Скрипты приложения -->
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
