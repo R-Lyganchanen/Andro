@@ -5,8 +5,7 @@
   <title>App — Код</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <!-- Для Android/Chrome -->
-<meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="App">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -37,7 +36,7 @@
       <button data-key="7">7</button>
       <button data-key="8">8</button>
       <button data-key="9">9</button>
-    <button class="empty" disabled></button>
+      <button class="empty" disabled></button>
       <button data-key="0">0</button>
       <button class="backspace" data-key="back">×</button>
     </div>
@@ -45,56 +44,61 @@
     <div class="passcode__footer">Не пам’ятаю код для входу</div>
   </div>
 </div>
-  <script src="script.js" defer></script>
-  <script>
-    // Логика ввода кода 1234, сброс при ошибке, переход на page3.html
-    (function () {
-      const correct = '1234';
-      let input = '';
 
-      const dots = Array.from(document.querySelectorAll('.dots .dot'));
-      const keypad = document.querySelector('.keypad');
+<script>
+  // Логика ввода кода 1234, сброс при ошибке, переход на page3.html
+  (function () {
+    const correct = '1234';
+    let input = '';
 
-      function renderDots(len) {
-        dots.forEach((d, i) => {
-          d.classList.toggle('filled', i < len);
-        });
-      }
+    const dots = Array.from(document.querySelectorAll('.dots .dot'));
+    const keypad = document.querySelector('.keypad');
 
-      function reset() {
-        input = '';
-        renderDots(0);
-      }
+    function renderDots(len) {
+      dots.forEach((d, i) => {
+        d.classList.toggle('filled', i < len);
+      });
+    }
 
-      keypad.addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        const key = btn.dataset.key;
+    function reset() {
+      input = '';
+      renderDots(0);
+    }
 
-        if (key === 'back') {
+    keypad.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const key = btn.dataset.key;
+
+      if (key === 'back') {
+        if (input.length > 0) {
           input = input.slice(0, -1);
           renderDots(input.length);
-          return;
+        }
+        return;
+      }
+
+      if (/^\d$/.test(key)) {
+        if (input.length < 4) {
+          input += key;
+          renderDots(input.length);
         }
 
-        if (/^\d$/.test(key)) {
-          if (input.length < 4) {
-            input += key;
-            renderDots(input.length);
-          }
-          if (input.length === 4) {
-            if (input === correct) {
-              location.href = 'page3.html';
-            } else {
-              reset(); // молча сбрасываем
-            }
+        if (input.length === 4) {
+          if (input === correct) {
+            location.href = 'page3.html';
+          } else {
+            // небольшая задержка, чтобы показать ошибку
+            setTimeout(reset, 300);
           }
         }
-      });
-    })();
-  </script>
-  <script src="db.js"></script>
+      }
+    });
+  })();
+</script>
+
+<script src="db.js"></script>
 <script src="app.js"></script>
+<script src="script.js" defer></script>
 </body>
-
 </html>
