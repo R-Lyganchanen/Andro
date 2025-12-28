@@ -8,97 +8,198 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="App">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Базовый стиль для самодостаточности примера */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #0f0f10;
+      color: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .passcode {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 24px;
+    }
+    .passcode__header {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+    .dots {
+      display: flex;
+      gap: 12px;
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #888;
+      background: transparent;
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+    .dot.filled {
+      background: #fff;
+      border-color: #fff;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 64px);
+      gap: 12px;
+      touch-action: manipulation; /* ускоряет тач-клики */
+    }
+    .keypad button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      height: 64px;
+      font-size: 20px;
+      color: #fff;
+      background: #1c1c20;
+      box-shadow: 0 0 0 1px #2a2a2e inset;
+      transition: transform 80ms ease, background 120ms ease;
+    }
+    .keypad button:active {
+      transform: scale(0.97);
+      background: #2a2a2e;
+    }
+    .keypad button.empty {
+      background: transparent;
+      box-shadow: none;
+    }
+    .keypad button.backspace {
+      font-weight: 700;
+    }
+    .passcode__footer {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+    /* На случай перекрывающих оверлеев — даём приоритет кликам по клавиатуре */
+    .keypad { position: relative; z-index: 10; }
+  </style>
 </head>
 <body>
-<div class="app form-screen page2">
-  <div class="app passcode">
+  <div class="passcode" id="passcodeRoot">
     <div class="passcode__header">Код для входу</div>
 
     <!-- Индикатор (4 точки) -->
-    <div class="dots">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
+    <div class="dots" aria-label="Прогресс ввода кода">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="dot" aria-hidden="true"></span>
     </div>
 
     <!-- Цифровая клавиатура -->
-    <div class="keypad">
-      <button data-key="1">1</button>
-      <button data-key="2">2</button>
-      <button data-key="3">3</button>
-      <button data-key="4">4</button>
-      <button data-key="5">5</button>
-      <button data-key="6">6</button>
-      <button data-key="7">7</button>
-      <button data-key="8">8</button>
-      <button data-key="9">9</button>
-      <button class="empty" disabled></button>
-      <button data-key="0">0</button>
-      <button class="backspace" data-key="back">×</button>
+    <div class="keypad" role="group" aria-label="Клавиатура ввода кода">
+      <button type="button" data-key="1">1</button>
+      <button type="button" data-key="2">2</button>
+      <button type="button" data-key="3">3</button>
+      <button type="button" data-key="4">4</button>
+      <button type="button" data-key="5">5</button>
+      <button type="button" data-key="6">6</button>
+      <button type="button" data-key="7">7</button>
+      <button type="button" data-key="8">8</button>
+      <button type="button" data-key="9">9</button>
+      <button type="button" class="empty" disabled aria-hidden="true"></button>
+      <button type="button" data-key="0">0</button>
+      <button type="button" class="backspace" data-key="back" aria-label="Удалить">×</button>
     </div>
 
     <div class="passcode__footer">Не пам’ятаю код для входу</div>
   </div>
-</div>
 
-<script>
-  // Логика ввода кода 1234, сброс при ошибке, переход на page3.html
-  (function () {
-    const correct = '1234';
-    let input = '';
+  <script>
+    (function () {
+      // Конфиг: правильный код и цель перехода
+      const CORRECT = '1234';
+      const REDIRECT = 'page3.html';
 
-    const dots = Array.from(document.querySelectorAll('.dots .dot'));
-    const keypad = document.querySelector('.keypad');
+      // Состояние ввода
+      let input = '';
+      let locked = false; // блокировка во время анимации/сброса
 
-    function renderDots(len) {
-      dots.forEach((d, i) => {
-        d.classList.toggle('filled', i < len);
-      });
-    }
+      // Узлы
+      const dots = Array.from(document.querySelectorAll('.dots .dot'));
+      const keypad = document.querySelector('.keypad');
 
-    function reset() {
-      input = '';
-      renderDots(0);
-    }
+      // Принудительно снимаем любые глобальные блокировки прокрутки, которые могли повлиять на события
+      // (если в других скриптах есть preventDefault на touchmove/wheel без нужды)
+      window.addEventListener('touchmove', () => {}, { passive: true });
 
-    keypad.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const key = btn.dataset.key;
-
-      if (key === 'back') {
-        if (input.length > 0) {
-          input = input.slice(0, -1);
-          renderDots(input.length);
-        }
-        return;
+      function renderDots(len) {
+        dots.forEach((d, i) => d.classList.toggle('filled', i < len));
       }
 
-      if (/^\d$/.test(key)) {
-        if (input.length < 4) {
-          input += key;
-          renderDots(input.length);
-        }
+      function resetImmediate() {
+        input = '';
+        renderDots(0);
+        locked = false;
+      }
+
+      function resetSoft(delay = 250) {
+        locked = true;
+        // Дадим пользователю увидеть, что 4 точки заполнились, затем очистка
+        setTimeout(resetImmediate, delay);
+      }
+
+      function handleDigit(key) {
+        if (locked) return;
+        if (input.length >= 4) return; // не позволяем набивать больше 4
+
+        input += key;
+        renderDots(input.length);
 
         if (input.length === 4) {
-          if (input === correct) {
-            location.href = 'page3.html';
+          if (input === CORRECT) {
+            // Чтобы избежать двойного перехода при быстрых двойных тачах
+            locked = true;
+            location.href = REDIRECT;
           } else {
-            // небольшая задержка, чтобы показать ошибку
-            setTimeout(reset, 300);
+            resetSoft(250);
           }
         }
       }
-    });
-  })();
-</script>
 
-<script src="db.js"></script>
-<script src="app.js"></script>
-<script src="script.js" defer></script>
+      function handleBackspace() {
+        if (locked) return;
+        if (input.length === 0) return;
+        input = input.slice(0, -1);
+        renderDots(input.length);
+      }
+
+      // Универсальный обработчик: работает для кликов и тачей, без зависимости от текста кнопки.
+      function routeKey(key) {
+        if (key === 'back') return handleBackspace();
+        if (/^\d$/.test(key)) return handleDigit(key);
+      }
+
+      // Обработчик кликов
+      keypad.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.disabled) return;
+        const key = btn.dataset.key;
+        routeKey(key);
+      });
+
+      // Обработчик тачей для «мгновенного» ввода (некоторые мобильные браузеры задерживают click)
+      keypad.addEventListener('touchstart', (e) => {
+        const touch = e.target.closest('button');
+        if (!touch || touch.disabled) return;
+        const key = touch.dataset.key;
+        routeKey(key);
+        // Не даём генерироваться вторичному клику после touchstart
+        e.preventDefault();
+      }, { passive: false });
+
+      // Инициализация
+      renderDots(0);
+    })();
+  </script>
 </body>
 </html>
