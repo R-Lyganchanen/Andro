@@ -389,6 +389,8 @@ body {
   height: 22px;
   object-fit: contain;
   flex: 0 0 32px;
+  margin-left: -18px;   /* зсуває іконку лівіше */
+  flex-shrink: 0;      /* не дає іконці стискатися */
 }
 
 /* Название пункта */
@@ -637,3 +639,4 @@ body {
   
 
 }
+
