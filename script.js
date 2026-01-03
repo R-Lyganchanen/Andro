@@ -47,6 +47,29 @@ overlay.addEventListener('click', () => {
 });
 })();
 
+// Оброботчик кнопок в меню PLUS
+document.addEventListener('DOMContentLoaded', () => {
+  // Вішаємо обробник на всі кнопки меню
+  document.querySelectorAll('.menu-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+
+      // Для пункту item2 — завантаження PDF
+      if (action === 'item2') {
+        const file = 'File_PDF.pdf'; // назва твого PDF у папці PDF
+        const link = document.createElement('a');
+        link.href = `PDF/${file}`;
+        link.download = file;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Тут пізніше можна додати інші дії для інших пунктів
+    });
+  });
+});
+// ======================================================================================================================
 /* =========================================================
    Переворот карточки + обработка кнопки page3
    ========================================================= */
@@ -123,4 +146,5 @@ overlay.addEventListener('click', () => {
     }
   });
 })();
+
 
